@@ -14,6 +14,7 @@ class profile::puppet::ca {
   $autosign = [
     $profile::params::pe_console_certname,
     $profile::params::pe_puppetdb01_fqdn,
+    $profile::params::pe_puppetdb02_fqdn,
   ]
 
   ## Additional certificates to create on the CA

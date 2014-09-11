@@ -20,6 +20,7 @@ class profile::puppet::console {
   ## Also disable whitelist exporting, since we can't collect them durig
   ## bootstrapping anyway.
   class { 'pe_server':
+    ca_server                    => $profile::params::pe_puppetca_fqdn,
     filebucket_server            => $profile::params::pe_puppetmaster_fqdn,
     export_puppetdb_whitelist    => false,
     export_console_authorization => false,
@@ -45,8 +46,9 @@ class profile::puppet::console {
 
   ## Configure the console's database connection
   class { 'pe_server::console::database':
-    password => $profile::params::pe_puppetconsole_pgdb_password,
-    host     => $profile::params::pe_puppetconsolepg_fqdn,
+    password              => $profile::params::pe_puppetconsole_pgdb_password,
+    console_auth_password => $profile::params::pe_puppetconsoleauth_pgdb_password,
+    host                  => $profile::params::pe_puppetconsolepg_fqdn,
   }
 
   ## We need to manage PostgreSQL with the PuppetDB class, since that's how

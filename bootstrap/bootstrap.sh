@@ -14,6 +14,11 @@ ANSWER_PATH="answers"
 ## Probably don't need to modify below this
 ################################################################################
 
+if [ "$(whoami)" != "root" ]; then
+  echo "You must run this as root."
+  exit 1
+fi
+
 ## This file includes the hostnames that we need
 source answers/common.txt
 
@@ -21,13 +26,15 @@ echo
 echo "===================================================================="
 echo "Select which node to install:"
 echo
-echo "  [1] ${PUPPETCA01}"
-echo "  [2] ${PUPPETDB01}"
-echo "  [3] ${PUPPETCONSOLE01}"
+echo "  [1] Primary CA/Master         ${PUPPETCA01}"
+echo "  [2] Primary PuppetDB/pgsql    ${PUPPETDB01}"
+echo "  [3] Primary Console/pgsql     ${PUPPETCONSOLE01}"
 echo
-echo "  [4] ${PUPPETCA02}"
-echo "  [5] ${PUPPETDB02}"
-echo "  [6] ${PUPPETCONSOLE02}"
+echo "  [4] Secondary CA/Master       ${PUPPETCA02}"
+echo "  [5] Secondary PuppetDB        ${PUPPETDB02}"
+echo "  [6] Secondary Console         ${PUPPETCONSOLE02}"
+echo
+echo "  [7] Additional Compile-only master"
 echo
 read -p "Selection: " server_role
 
@@ -265,7 +272,8 @@ case $server_role in
       echo "# Example:"
       echo "#   On this node:"
       echo "     mkdir -p /opt/puppet/share/puppet-dashboard"
-      echo "     chown 496: /opt/puppet/share/puppet-dashboard"
+      echo "     chown uid:gid /opt/puppet/share/puppet-dashboard"
+      echo "       (where 'uid/gid' is the uid/gid of puppet-dashboard on ${PUPPETCONSOLE01})"
       echo
       echo "     rsync -avzp -e 'ssh' \\"
       echo "        ${PUPPETCA01}:/opt/puppet/share/puppet-dashboard/certs/ \\"
@@ -294,7 +302,55 @@ case $server_role in
 
     ca_sign_cert "${PUPPETCONSOLE02}.${DOMAIN}"
 
+    echo "==> Running Puppet agent to retrieve signed certificate"
+    echo "    You will see some errors here, but that should be okay."
+    /opt/puppet/bin/puppet agent -t
+
+    apply_puppet_role "${ROLE}"
+
     echo "==> ${PUPPETCONSOLE02} complete"
+  ;;
+  #############################################################################
+  ## Additional masters
+  #############################################################################
+  7)
+    ANSWERS="puppetmaster01"
+    ROLE="role::puppet::master"
+    ALT_NAMES="${PUPPETCONSOLE02},${PUPPETCONSOLE}.${DOMAIN},${PUPPETCONSOLE},${PUPPETCONSOLEPG}.${DOMAIN},${PUPPETCONSOLEPG}"
+
+    echo ""
+    echo -e "${txtylw}"
+    echo "#=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+    echo -e "${txtrst}"
+    echo
+    read -p "What should the fqdn of this master be?: " cert_clean
+    while [ "${cert_clean}" != "y" ]; do
+      ca_clean_cert $1
+    done
+
+    confirm_install "${PUPPETCONSOLE02}"
+
+    if ! has_pe; then
+      install_pe $ANSWERS
+    fi
+
+    ## Install some needed software
+    echo "==> Installing git..."
+    /opt/puppet/bin/puppet resource package git ensure=present || \
+      (echo "git failed to install; exiting." && exit 1)
+
+    echo "==> Installing r10k..."
+    /opt/puppet/bin/gem install r10k || \
+      (echo "r10k failed to install; exiting" && exit 1)
+
+    ## Use r10k to fetch all the modules needed
+    cd "../"
+    echo "Running r10k against Puppetfile..."
+    /opt/puppet/bin/r10k Puppetfile install -v || \
+      (echo "r10k didn't exit cleanly; exiting" && exit 1)
+
+    apply_puppet_role "${ROLE}"
+    echo "==> ${PUPPETCA01} complete"
   ;;
   *)
     echo "Unknown selection: ${server_role}"

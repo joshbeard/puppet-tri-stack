@@ -1,10 +1,10 @@
-source $( dirname "${BASH_SOURCE[0]}" )/pe_passwords.txt
+source $( dirname "${BASH_SOURCE[0]}" )/common.txt
 
 q_all_in_one_install=y
 q_backup_and_purge_old_configuration=n
 q_backup_and_purge_old_database_directory=n
 
-q_database_host=${PUPPETCONSOLE01}.${DOMAIN}
+q_database_host=${PUPPETCONSOLE02}.${DOMAIN}
 q_database_install=y
 q_database_port=5432
 q_database_root_user=pe-postgres
