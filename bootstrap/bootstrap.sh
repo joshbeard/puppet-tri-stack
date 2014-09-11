@@ -22,6 +22,9 @@ fi
 ## This file includes the hostnames that we need
 source answers/common.txt
 
+echo "4: $( dirname "${BASH_SOURCE[0]}" )"
+exit
+
 echo
 echo "===================================================================="
 echo "Select which node to install:"
@@ -47,7 +50,7 @@ txtcyn="\033[0;36m" # Cyan
 txtwht="\033[0;37m" # White
 txtrst="\033[0m"
 
-_script_dir=$(dirname $0)
+_script_dir=$PWD
 
 function install_pe() {
   ANSWERS="$1"
