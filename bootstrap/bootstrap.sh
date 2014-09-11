@@ -6,52 +6,16 @@
 # installation.
 ###############################################################################
 
-PE_VERSION="3.3.2"
-INSTALL_PATH="/vagrant/puppet/pe/puppet-enterprise-${PE_VERSION}-el-6-x86_64"
-ANSWER_PATH="/vagrant/puppet/answers"
-
-## The domain name to use for the hosts' fqdn
-DOMAIN="vagrant.vm"
-
-## The generic name that points to active Puppet Master(s)
-PUPPETMASTER="puppetmaster"
-
-## The generic name that points to an active CA
-PUPPETCA="puppetca"
-
-## The name that points to the primary CA
-PUPPETCA01="puppetca01"
-
-## The name that points to the secondary CA
-PUPPETCA02="puppetca02"
-
-## The generic name that points to an active PuppetDB instance
-PUPPETDB="puppetdb"
-
-## The name that points to the primary PuppetDB instance
-PUPPETDB01="puppetdb01"
-
-## The name that points to the secondary PuppetDB instance
-PUPPETDB02="puppetdb02"
-
-## The generic name that points to an active PostgreSQL instance for PuppetDB
-PUPPETDBPG="puppetdbpg"
-
-## The generic name that points to an active console
-PUPPETCONSOLE="puppetconsole"
-
-## The name that points to the primary console
-PUPPETCONSOLE01="puppetconsole01"
-
-## The name that points to the secondary console
-PUPPETCONSOLE02="puppetconsole02"
-
-## The generic name that points to an active PostgreSQL instance for the console
-PUPPETCONSOLEPG="puppetconsolepg"
+PE_VERSION="3.3.1"
+INSTALL_PATH="pe/puppet-enterprise-${PE_VERSION}-el-6-x86_64"
+ANSWER_PATH="answers"
 
 ################################################################################
 ## Probably don't need to modify below this
 ################################################################################
+
+## This file includes the hostnames that we need
+source answers/common.txt
 
 echo
 echo "===================================================================="
@@ -92,7 +56,7 @@ function has_pe() {
 function apply_puppet_role() {
   echo "==> Applying Puppet role of ${1}"
   /opt/puppet/bin/puppet apply -e "include ${1}" \
-    --modulepath=site:modules:/opt/puppet/share/puppet/modules
+    --modulepath=../site:../modules:/opt/puppet/share/puppet/modules
 }
 
 function ca_clean_cert() {
@@ -116,7 +80,7 @@ function ca_sign_cert() {
   echo "    puppet cert sign --allow-dns-alt-names ${1}"
   echo
   read -p "# Press 'y' when the certificate has been signed: " sign_cert
-  while [ "${sign_clean}" != "y" ]; do
+  while [ "${sign_cert}" != "y" ]; do
     ca_sign_cert $1
   done
 }
@@ -139,7 +103,6 @@ case $server_role in
     ## Primary CA
     ANSWERS="puppetca01"
     ROLE="role::puppet::ca"
-    ALT_NAMES="${PUPPETCA01},${PUPPETCA02}.${DOMAIN},${PUPPETCA02},${PUPPETCA}.${DOMAIN},${PUPPETCA},${PUPPETMASTER}.${DOMAIN},${PUPPETMASTER}"
 
     confirm_install "${PUPPETCA01}"
 
@@ -148,15 +111,17 @@ case $server_role in
     fi
 
     ## Install some needed software
+    echo "==> Installing git..."
     /opt/puppet/bin/puppet resource package git ensure=present || \
       (echo "git failed to install; exiting." && exit 1)
 
+    echo "==> Installing r10k..."
     /opt/puppet/bin/gem install r10k || \
       (echo "r10k failed to install; exiting" && exit 1)
 
-
     ## Use r10k to fetch all the modules needed
     cd "../"
+    echo "Running r10k against Puppetfile..."
     /opt/puppet/bin/r10k Puppetfile install -v || \
       (echo "r10k didn't exit cleanly; exiting" && exit 1)
 
@@ -170,7 +135,6 @@ case $server_role in
     ## Secondary CA
     ANSWERS="puppetca02"
     ROLE="role::puppet::ca"
-    ALT_NAMES="${PUPPETCA01}.${DOMAIN},${PUPPETCA01},${PUPPETCA02},${PUPPETCA}.${DOMAIN},${PUPPETCA},${PUPPETMASTER}.${DOMAIN},${PUPPETMASTER}"
 
     confirm_install "${PUPPETCA02}"
 
@@ -187,6 +151,7 @@ case $server_role in
     echo "#"
     echo "# You should do this after every other node is spun up."
     echo "# After copied, run the following on this node:"
+    echo "#    service pe-httpd restart"
     echo "#    puppet agent -t --server ${PUPPETCA01}.${DOMAIN}"
     echo "#######################################################################"
   ;;
@@ -224,6 +189,9 @@ case $server_role in
     ca_clean_cert "${NAME}.${DOMAIN}"
 
     echo "==> Running Puppet agent to create CSR"
+    echo "==> You will see an error here indicating that the certificate"
+    echo "==> contains alternate names and cannot be automatically signed."
+    echo "==> That's okay."
     /opt/puppet/bin/puppet agent -t
 
     ca_sign_cert "${NAME}.${DOMAIN}"
@@ -262,6 +230,9 @@ case $server_role in
     rm -f /opt/puppet/share/puppet-dashboard/certs/*
 
     echo "==> Running Puppet agent to create CSR"
+    echo "==> You will see an error here indicating that the certificate"
+    echo "==> contains alternate names and cannot be automatically signed."
+    echo "==> That's okay."
     /opt/puppet/bin/puppet agent -t
 
     ca_sign_cert "${PUPPETCONSOLE01}.${DOMAIN}"
@@ -316,6 +287,9 @@ case $server_role in
     rm -rf /etc/puppetlabs/puppet/ssl
 
     echo "==> Running Puppet agent to create CSR"
+    echo "==> You will see an error here indicating that the certificate"
+    echo "==> contains alternate names and cannot be automatically signed."
+    echo "==> That's okay."
     /opt/puppet/bin/puppet agent -t
 
     ca_sign_cert "${PUPPETCONSOLE02}.${DOMAIN}"

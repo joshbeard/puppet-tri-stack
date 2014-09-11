@@ -1,4 +1,4 @@
-source common.txt
+source $( dirname "${BASH_SOURCE[0]}" )/common.txt
 
 q_all_in_one_install=y
 q_backup_and_purge_old_configuration=n

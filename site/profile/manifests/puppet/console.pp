@@ -6,19 +6,21 @@
 ##   - Configure PuppetDB to use the primary PostgreSQL database
 class profile::puppet::console {
 
+  include profile::params
+
   ## We only want the 'primary' console to create the certificates.
   ## Additional consoles will need to obtain their certificates from the
   ## primary console.
   $create_console_certs = $::clientcert ? {
-    /puppetconsole01.*/ => true,
-    default             => false,
+    $profile::params::pe_puppetconsole01_fqdn => true,
+    default                                   => false,
   }
 
   ## Configure the filebucket
   ## Also disable whitelist exporting, since we can't collect them durig
   ## bootstrapping anyway.
   class { 'pe_server':
-    filebucket_server            => 'puppetmaster.vagrant.vm',
+    filebucket_server            => $profile::params::pe_puppetmaster_fqdn,
     export_puppetdb_whitelist    => false,
     export_console_authorization => false,
   }
@@ -33,9 +35,9 @@ class profile::puppet::console {
   ## Don't retrieve the console certs from the CA, create them on the primary,
   ## and don't collected exported whitelist entries.
   class { 'pe_server::console':
-    ca_server                      => 'puppetca.vagrant.vm',
-    inventory_server               => 'puppetmaster.vagrant.vm',
-    console_cert_name              => 'pe-internal-dashboard',
+    ca_server                      => $profile::params::pe_puppetca_fqdn,
+    inventory_server               => $profile::params::pe_puppetmaster_fqdn,
+    console_cert_name              => $profile::params::pe_console_certname,
     console_certs_from_ca          => false,
     create_console_certs           => $create_console_certs,
     collect_exported_authorization => false,
@@ -43,21 +45,22 @@ class profile::puppet::console {
 
   ## Configure the console's database connection
   class { 'pe_server::console::database':
-    password => 'hunter2',
-    host     => 'puppetconsolepg.vagrant.vm',
+    password => $profile::params::pe_puppetconsole_pgdb_password,
+    host     => $profile::params::pe_puppetconsolepg_fqdn,
   }
 
   ## We need to manage PostgreSQL with the PuppetDB class, since that's how
   ## PE does it.
   class { 'pe_server::puppetdb':
     puppetdb_ssl_setup     => false,
-    postgres_database_host => 'puppetconsolepg.vagrant.vm',
+    postgres_database_host => $profile::params::pe_puppetconsolepg_fqdn,
   }
 
   ## Add some console authorizations
   pe_server::console::authorization { $::settings::server: }
   pe_server::console::authorization { $::clientcert: }
-  pe_server::console::authorization { 'puppetca01.vagrant.vm': }
+  pe_server::console::authorization { $profile::params::pe_puppetca01_fqdn: }
+  pe_server::console::authorization { $profile::params::pe_puppetca02_fqdn: }
 
 
   ## Disable the PuppetDB service

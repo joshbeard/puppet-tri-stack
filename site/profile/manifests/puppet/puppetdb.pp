@@ -3,21 +3,23 @@
 ##
 class profile::puppet::puppetdb {
 
+  include profile::params
+
   class { 'pe_server':
-    ca_server                    => 'puppetca.vagrant.vm',
+    ca_server                    => $profile::params::pe_puppetca_fqdn,
     export_puppetdb_whitelist    => false,
     export_console_authorization => false,
   }
 
   class { 'pe_server::puppetdb':
-    postgres_database_host     => 'puppetdbpg.vagrant.vm',
+    postgres_database_host     => $profile::params::pe_puppetdbpg_fqdn,
   }
 
   ## Explicitly define whitelisted certificates
   pe_server::puppetdb::whitelist { $::settings::server: }
   pe_server::puppetdb::whitelist { $::clientcert: }
-  pe_server::puppetdb::whitelist { 'pe-internal-dashboard': }
-  pe_server::puppetdb::whitelist { 'puppetca01.vagrant.vm': }
-  pe_server::puppetdb::whitelist { 'puppetca02.vagrant.vm': }
+  pe_server::puppetdb::whitelist { $profile::params::pe_console_certname: }
+  pe_server::puppetdb::whitelist { $profile::params::pe_puppetca01_fqdn: }
+  pe_server::puppetdb::whitelist { $profile::params::pe_puppetca02_fqdn: }
 
 }
