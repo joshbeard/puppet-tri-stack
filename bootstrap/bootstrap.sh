@@ -63,7 +63,7 @@ function has_pe() {
 function apply_puppet_role() {
   echo "==> Applying Puppet role of ${1}"
   /opt/puppet/bin/puppet apply -e "include ${1}" \
-    --modulepath=../site:../modules:/opt/puppet/share/puppet/modules
+    --modulepath=./../site:./../modules:/opt/puppet/share/puppet/modules
 }
 
 function ca_clean_cert() {
@@ -129,7 +129,7 @@ case $server_role in
     ## Use r10k to fetch all the modules needed
     cd "../"
     echo "Running r10k against Puppetfile..."
-    /opt/puppet/bin/r10k Puppetfile install -v || \
+    /opt/puppet/bin/r10k puppetfile install -v || \
       (echo "r10k didn't exit cleanly; exiting" && exit 1)
 
     apply_puppet_role "${ROLE}"
