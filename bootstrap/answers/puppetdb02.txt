@@ -1,4 +1,4 @@
-source pe_passwords.txt
+source common.txt
 
 q_all_in_one_install=n
 q_backup_and_purge_old_configuration=n
@@ -6,7 +6,7 @@ q_backup_and_purge_old_database_directory=n
 
 ## Point this to itself for installation, otherwise we'll fail because
 ## postgres will try to bind to the interface of the generic name
-q_database_host=puppetdb02.vagrant.vm
+q_database_host=${PUPPETDB02}.${DOMAIN}
 
 q_database_install=y
 q_database_port=5432
@@ -21,21 +21,21 @@ q_puppet_enterpriseconsole_database_name=console
 q_puppet_enterpriseconsole_database_user=console
 q_puppet_enterpriseconsole_install=n
 
-q_puppetagent_certname=puppetdb02.vagrant.vm
+q_puppetagent_certname=${PUPPETDB02}.${DOMAIN}
 q_puppetagent_install=y
 
-q_puppetagent_server=puppetmaster.vagrant.vm
+q_puppetagent_server=${PUPPETMASTER}.${DOMAIN}
 
 q_puppetdb_database_name=pe-puppetdb
 q_puppetdb_database_user=pe-puppetdb
 
-q_puppetdb_hostname=puppetdb02.vagrant.vm
+q_puppetdb_hostname=${PUPPETDB02}.${DOMAIN}
 
 q_puppetdb_install=y
 q_puppetdb_plaintext_port=8080
 q_puppetdb_port=8081
 
-q_puppetmaster_certname=puppetmaster.vagrant.vm
+q_puppetmaster_certname=${PUPPETMASTER}.${DOMAIN}
 q_puppetmaster_install=n
 q_run_updtvpkg=n
 q_vendor_packages_install=y
