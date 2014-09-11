@@ -22,9 +22,6 @@ fi
 ## This file includes the hostnames that we need
 source answers/common.txt
 
-echo "4: $( dirname "${BASH_SOURCE[0]}" )"
-exit
-
 echo
 echo "===================================================================="
 echo "Select which node to install:"
