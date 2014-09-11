@@ -47,6 +47,8 @@ txtcyn="\033[0;36m" # Cyan
 txtwht="\033[0;37m" # White
 txtrst="\033[0m"
 
+_script_dir=$(dirname $0)
+
 function install_pe() {
   ANSWERS="$1"
   "${INSTALL_PATH}/puppet-enterprise-installer" -A "${ANSWER_PATH}/${ANSWERS}.txt"
@@ -63,7 +65,7 @@ function has_pe() {
 function apply_puppet_role() {
   echo "==> Applying Puppet role of ${1}"
   /opt/puppet/bin/puppet apply -e "include ${1}" \
-    --modulepath=./../site:./../modules:/opt/puppet/share/puppet/modules
+    --modulepath=${_script_dir}/../site:${_script_dir}/../modules:/opt/puppet/share/puppet/modules
 }
 
 function ca_clean_cert() {
