@@ -34,7 +34,7 @@ case $::clientcert {
 ###############################################################################
 
 filebucket { 'main':
-  server => $profile::puppetmaster_fqdn,
+  server => $profile::params::puppetmaster_fqdn,
   path   => false,
 }
 
