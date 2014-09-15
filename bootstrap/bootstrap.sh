@@ -137,6 +137,16 @@ case $server_role in
       (echo "r10k didn't exit cleanly; exiting" && exit 1)
 
     apply_puppet_role "${ROLE}"
+
+    echo "********************************************************************"
+    echo "r10k needs to be ran to create the environments and install modules."
+    echo "You can do this by executing:"
+    echo "   r10k deploy environment -pv"
+    echo
+    read -p "=> Should we run r10k now? [y/n] " run_r10k
+    if [ "${run_r10k}" == "y" ]; then
+      /opt/puppet/bin/r10k deploy environment -pv
+    fi
     echo "==> ${PUPPETCA01} complete"
   ;;
   #############################################################################
@@ -166,6 +176,7 @@ case $server_role in
     echo "# You should do this after every other node is spun up."
     echo "# After copied, run the following on this node:"
     echo "#    service pe-httpd restart"
+    echo "#    rm -f /etc/puppetlabs/activemq/broker.*"
     echo "#    puppet agent -t --server ${PUPPETCA01}.${DOMAIN}"
     echo -e "${txtylw}"
     echo "#######################################################################"
@@ -348,6 +359,16 @@ case $server_role in
     echo "==> Running Puppet agent to retrieve signed certificate"
     echo "    You will see some errors here, but that should be okay."
     /opt/puppet/bin/puppet agent -t
+
+    echo "********************************************************************"
+    echo "r10k needs to be ran to create the environments and install modules."
+    echo "You can do this by executing:"
+    echo "   r10k deploy environment -pv"
+    echo
+    read -p "=> Should we run r10k now? [y/n] " run_r10k
+    if [ "${run_r10k}" == "y" ]; then
+      /opt/puppet/bin/r10k deploy environment -pv
+    fi
     echo "==> $(hostname -f) complete"
   ;;
   *)

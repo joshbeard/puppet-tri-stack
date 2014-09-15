@@ -6,20 +6,14 @@ class profile::puppet::master {
   ## Mcollective servers
   $stomp_servers = join($profile::params::pe_stomp_servers, ',')
 
-  ## Masters are not active CAs.  The 'puppetca01' host is, however
-  $active_ca = $::clientcert ? {
-    $profile::params::pe_puppetca01_fqdn => true,
-    default                              => false,
-  }
-
   ## Manage various architecture settings, such as CA settings
   class { 'pe_server':
     is_master                    => true,
-    active_ca                    => $active_ca,
     ca_server                    => $profile::params::pe_puppetca_fqdn,
     export_console_authorization => false,
     export_puppetdb_whitelist    => false,
   }
+
 
   ## Configure Mcollective - we want to share credentials and provide multiple
   ## brokers
@@ -49,7 +43,7 @@ class profile::puppet::master {
     manage_modulepath => false,
     mcollective       => false,
     notify            => Service['pe-httpd'],
-  },
+  }
 
   ## Ensure an environments directory exists
   file { "${::settings::confdir}/environments":

@@ -48,6 +48,6 @@ class profile::params {
     $pe_puppetca02_fqdn,
   ]
 
-  $control_repo_address               = 'git@....'
+  $control_repo_address               = 'https://github.com/joshbeard/ppuppet.git'
   #############################################################################
 }

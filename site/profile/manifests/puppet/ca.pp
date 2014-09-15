@@ -42,8 +42,4 @@ class profile::puppet::ca {
     notify                    => Service['pe-httpd'],
   }
 
-  ## Manage this service so we can notify it
-  service { 'pe-httpd':
-    ensure => 'running',
-  }
 }
