@@ -178,6 +178,9 @@ case $server_role in
     echo "#    service pe-httpd restart"
     echo "#    rm -f /etc/puppetlabs/activemq/broker.*"
     echo "#    puppet agent -t --server ${PUPPETCA01}.${DOMAIN}"
+    echo "#"
+    echo "# Note that this CA needs to be classified with 'role::puppet::ca'"
+    echo "# prior to doing the agent run."
     echo -e "${txtylw}"
     echo "#######################################################################"
     echo -e "${txtrst}"
@@ -352,15 +355,22 @@ case $server_role in
     echo "==> You will see an error here indicating that the certificate"
     echo "==> contains alternate names and cannot be automatically signed."
     echo "==> That's okay."
-    /opt/puppet/bin/puppet agent -t
+    /opt/puppet/bin/puppet agent -t --server ${PUPPETCA01}.${DOMAIN}
 
     ca_sign_cert "$(hostname -f)"
 
     echo "==> Running Puppet agent to retrieve signed certificate"
     echo "    You will see some errors here, but that should be okay."
-    /opt/puppet/bin/puppet agent -t
+    /opt/puppet/bin/puppet agent -t --server ${PUPPETCA01}.${DOMAIN}
+
+    echo "==> Restarting pe-httpd restart..."
+    service pe-httpd restart
+
 
     echo "********************************************************************"
+    echo "You'll need to add this master's certname to the list of PuppetDB and"
+    echo "Console authorizations.  Refer to the documentation for steps on this."
+    echo
     echo "r10k needs to be ran to create the environments and install modules."
     echo "You can do this by executing:"
     echo "   r10k deploy environment -pv"

@@ -1,5 +1,7 @@
 class profile::puppet::agent {
 
+  include profile::params
+
   class { 'pe_server':
     is_master                    => false,
     ca_server                    => $profile::params::pe_puppetca_fqdn,

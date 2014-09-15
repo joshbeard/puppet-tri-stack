@@ -37,6 +37,30 @@ class profile::params {
   $pe_puppetdb_pgdb_password          = 'hunter2'
   $pe_console_certname                = 'pe-internal-dashboard'
 
+  ## PuppetDB Whitelist
+  $pe_puppetdb_whitelist = [
+    $::clientcert,
+    $pe_console_certname,
+    $pe_puppetca01_fqdn,
+    $pe_puppetca02_fqdn,
+  ]
+
+  ## Console authorizations
+  $pe_console_authorizations = {
+    'pe-internal-dashboard' => {
+      'role'                => 'read-write'
+    },
+    "${::clientcert}"       => {
+      'role'                => 'read-write'
+    },
+    "${pe_puppetca01_fqdn}" => {
+      'role'                => 'read-write'
+    },
+    "${pe_puppetca02_fqdn}" => {
+      'role'                => 'read-write'
+    },
+  }
+
   ## Mcollective
   $pe_stomp_servers = [
     $pe_puppetca01_fqdn,

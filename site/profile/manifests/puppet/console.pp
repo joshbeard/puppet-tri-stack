@@ -59,10 +59,9 @@ class profile::puppet::console {
   }
 
   ## Add some console authorizations
-  pe_server::console::authorization { $::clientcert: }
-  pe_server::console::authorization { $profile::params::pe_puppetca01_fqdn: }
-  pe_server::console::authorization { $profile::params::pe_puppetca02_fqdn: }
-
+  class { 'pe_server::console::authorization':
+    authorizations            => $profile::params::pe_console_authorizations,
+  }
 
   ## Disable the PuppetDB service
   ## This is already being managed by a PE class, so we use a collector
