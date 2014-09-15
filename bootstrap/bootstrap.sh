@@ -51,7 +51,9 @@ _script_dir=$PWD
 
 function install_pe() {
   ANSWERS="$1"
-  "${INSTALL_PATH}/puppet-enterprise-installer" -A "${ANSWER_PATH}/${ANSWERS}.txt"
+  "${INSTALL_PATH}/puppet-enterprise-installer" \
+    -A "${ANSWER_PATH}/${ANSWERS}.txt" \
+    -l "/tmp/pe_install.$(hostname -f).$(date +%Y-%m-%d_%H-%M).log"
 }
 
 function has_pe() {
@@ -95,7 +97,7 @@ function ca_sign_cert() {
 }
 
 function confirm_install() {
-  echo -e "** You have selected to install ${txtylw}${1}${txtrst} **"
+  echo -e "** You have selected to install ${txtylw}${1}${txtrst} for node ${txtylw}$(hostname -f)${txtrst}**"
   echo
   read -p "Press 'y' to proceed: " proceed_install
   if [ "${proceed_install}" != "y" ]; then
@@ -153,7 +155,10 @@ case $server_role in
 
     apply_puppet_role "${ROLE}"
     echo "==> ${PUPPETCA02} complete"
+
+    echo -e "${txtylw}"
     echo "#######################################################################"
+    echo -e "${txtrst}"
     echo "# You will need to copy the /etc/puppetlabs/puppet/ssl directory from"
     echo "# ${PUPPETCA01}.${DOMAIN} to the same location on this node."
     echo "# Ensure that permissions and ownership are preserved"
@@ -162,7 +167,9 @@ case $server_role in
     echo "# After copied, run the following on this node:"
     echo "#    service pe-httpd restart"
     echo "#    puppet agent -t --server ${PUPPETCA01}.${DOMAIN}"
+    echo -e "${txtylw}"
     echo "#######################################################################"
+    echo -e "${txtrst}"
   ;;
   #############################################################################
   ## Primary and Secondary PuppetDB
@@ -316,43 +323,32 @@ case $server_role in
   ## Additional masters
   #############################################################################
   7)
-    ANSWERS="puppetmaster01"
+    ANSWERS="master"
     ROLE="role::puppet::master"
-    ALT_NAMES="${PUPPETCONSOLE02},${PUPPETCONSOLE}.${DOMAIN},${PUPPETCONSOLE},${PUPPETCONSOLEPG}.${DOMAIN},${PUPPETCONSOLEPG}"
 
-    echo ""
-    echo -e "${txtylw}"
-    echo "#=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-    echo -e "${txtrst}"
-    echo
-    read -p "What should the fqdn of this master be?: " cert_clean
-    while [ "${cert_clean}" != "y" ]; do
-      ca_clean_cert $1
-    done
-
-    confirm_install "${PUPPETCONSOLE02}"
+    confirm_install "additional master ($(hostname -f))"
 
     if ! has_pe; then
       install_pe $ANSWERS
     fi
 
-    ## Install some needed software
-    echo "==> Installing git..."
-    /opt/puppet/bin/puppet resource package git ensure=present || \
-      (echo "git failed to install; exiting." && exit 1)
-
-    echo "==> Installing r10k..."
-    /opt/puppet/bin/gem install r10k || \
-      (echo "r10k failed to install; exiting" && exit 1)
-
-    ## Use r10k to fetch all the modules needed
-    cd "../"
-    echo "Running r10k against Puppetfile..."
-    /opt/puppet/bin/r10k Puppetfile install -v || \
-      (echo "r10k didn't exit cleanly; exiting" && exit 1)
-
     apply_puppet_role "${ROLE}"
-    echo "==> ${PUPPETCA01} complete"
+
+    echo "==> Removing SSL data"
+    rm -rf /etc/puppetlabs/puppet/ssl
+
+    echo "==> Running Puppet agent to create CSR"
+    echo "==> You will see an error here indicating that the certificate"
+    echo "==> contains alternate names and cannot be automatically signed."
+    echo "==> That's okay."
+    /opt/puppet/bin/puppet agent -t
+
+    ca_sign_cert "$(hostname -f)"
+
+    echo "==> Running Puppet agent to retrieve signed certificate"
+    echo "    You will see some errors here, but that should be okay."
+    /opt/puppet/bin/puppet agent -t
+    echo "==> $(hostname -f) complete"
   ;;
   *)
     echo "Unknown selection: ${server_role}"

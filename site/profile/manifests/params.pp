@@ -36,5 +36,18 @@ class profile::params {
   $pe_puppetconsoleauth_pgdb_password = 'hunter2'
   $pe_puppetdb_pgdb_password          = 'hunter2'
   $pe_console_certname                = 'pe-internal-dashboard'
+
+  ## Mcollective
+  $pe_stomp_servers = [
+    $pe_puppetca01_fqdn,
+    $pe_puppetca02_fqdn,
+  ]
+
+  $pe_activemq_brokers = [
+    $pe_puppetca01_fqdn,
+    $pe_puppetca02_fqdn,
+  ]
+
+  $control_repo_address               = 'git@....'
   #############################################################################
 }

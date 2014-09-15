@@ -16,7 +16,6 @@ class profile::puppet::puppetdb {
   }
 
   ## Explicitly define whitelisted certificates
-  pe_server::puppetdb::whitelist { $::settings::server: }
   pe_server::puppetdb::whitelist { $::clientcert: }
   pe_server::puppetdb::whitelist { $profile::params::pe_console_certname: }
   pe_server::puppetdb::whitelist { $profile::params::pe_puppetca01_fqdn: }

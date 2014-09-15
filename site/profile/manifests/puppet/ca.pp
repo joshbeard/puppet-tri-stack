@@ -35,23 +35,11 @@ class profile::puppet::ca {
     }
   }
 
-  class { 'pe_server':
-    is_master                    => true,
-    ca_server                    => $profile::params::pe_puppetca_fqdn,
-    export_console_authorization => false,
-    export_puppetdb_whitelist    => false,
-  }
-
   class { 'pe_server::ca':
     active_ca                 => $active_ca,
     autosign                  => $autosign,
     generate_certs            => $generate_certs,
     notify                    => Service['pe-httpd'],
-  }
-
-  class { 'pe_server::mcollective':
-    primary            => $profile::params::pe_puppetca01_fqdn,
-    shared_credentials => true,
   }
 
   ## Manage this service so we can notify it

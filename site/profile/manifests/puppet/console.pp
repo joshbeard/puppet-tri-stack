@@ -59,7 +59,6 @@ class profile::puppet::console {
   }
 
   ## Add some console authorizations
-  pe_server::console::authorization { $::settings::server: }
   pe_server::console::authorization { $::clientcert: }
   pe_server::console::authorization { $profile::params::pe_puppetca01_fqdn: }
   pe_server::console::authorization { $profile::params::pe_puppetca02_fqdn: }
