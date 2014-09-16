@@ -351,7 +351,7 @@ case $server_role in
     echo "==> Removing SSL data"
     rm -rf /etc/puppetlabs/puppet/ssl
 
-    echo "==> Running Puppet agent to create CSR"
+    echo "==> Running Puppet agent against the CA to create CSR"
     echo "==> You will see an error here indicating that the certificate"
     echo "==> contains alternate names and cannot be automatically signed."
     echo "==> That's okay."
@@ -359,17 +359,24 @@ case $server_role in
 
     ca_sign_cert "$(hostname -f)"
 
-    echo "==> Running Puppet agent to retrieve signed certificate"
+    echo "==> Removing stale ActiveMQ broker keystores"
+    rm -f /etc/puppetlabs/activemq/broker.ks
+    rm -f /etc/puppetlabs/activemq/broker.ts
+
+    echo "==> Running Puppet agent against the primary CA to retrieve signed certificate"
     echo "    You will see some errors here, but that should be okay."
     /opt/puppet/bin/puppet agent -t --server ${PUPPETCA01}.${DOMAIN}
 
     echo "==> Restarting pe-httpd restart..."
     service pe-httpd restart
 
+    echo "==> Running puppet agent against myself"
+    /opt/puppet/bin/puppet agent -t
 
     echo "********************************************************************"
     echo "You'll need to add this master's certname to the list of PuppetDB and"
     echo "Console authorizations.  Refer to the documentation for steps on this."
+    echo "Hint: This should be added to the profile module's params class."
     echo
     echo "r10k needs to be ran to create the environments and install modules."
     echo "You can do this by executing:"
