@@ -43,6 +43,7 @@ class profile::params {
     $pe_console_certname,
     $pe_puppetca01_fqdn,
     $pe_puppetca02_fqdn,
+    "puppetmaster01.${::domain}",
   ]
 
   ## Console authorizations
@@ -59,17 +60,22 @@ class profile::params {
     "${pe_puppetca02_fqdn}" => {
       'role'                => 'read-write'
     },
+    "puppetmaster01.${::domain}" => {
+      'role'                => 'read-write'
+    },
   }
 
   ## Mcollective
   $pe_stomp_servers = [
     $pe_puppetca01_fqdn,
     $pe_puppetca02_fqdn,
+    "puppetmaster01.${::domain}",
   ]
 
   $pe_activemq_brokers = [
     $pe_puppetca01_fqdn,
     $pe_puppetca02_fqdn,
+    "puppetmaster01.${::domain}",
   ]
 
   $control_repo_address               = 'https://github.com/joshbeard/ppuppet.git'
