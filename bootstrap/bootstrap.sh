@@ -51,6 +51,17 @@ _script_dir=$PWD
 
 function install_pe() {
   ANSWERS="$1"
+
+  if [ ! -d "${INSTALL_PATH}" ]; then
+    echo "Failure: PE Installer not found at ${INSTALL_PATH}"
+    exit 1
+  fi
+
+  if [ -f "${ANSWER_PATH}/${ANSWERS}.txt" ]; then
+    echo "Failure: Answer file not found: ${ANSWER_PATH}/${ANSWERS}.txt"
+    exit 1
+  fi
+
   "${INSTALL_PATH}/puppet-enterprise-installer" \
     -A "${ANSWER_PATH}/${ANSWERS}.txt" \
     -l "/tmp/pe_install.$(hostname -f).$(date +%Y-%m-%d_%H-%M).log"
