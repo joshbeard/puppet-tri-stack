@@ -2,6 +2,9 @@
 # This file is for the various passwords the PE installer needs
 # You'll want these synchronized across the servers, so this file is sourced
 # by all the other answer files
+#
+# This is a helper file so that you don't have to specify these values in
+# several individual files.
 ###############################################################################
 ## The domain name to use for the hosts' fqdn
 DOMAIN="vagrant.vm"
@@ -42,8 +45,18 @@ PUPPETCONSOLE02="puppetconsole02"
 ## The generic name that points to an active PostgreSQL instance for the console
 PUPPETCONSOLEPG="puppetconsolepg"
 
+## Password for the PostgreSQL 'root' user
 q_database_root_password=hunter2
+
+## Password for the 'console_auth' PostgreSQL database
 q_puppet_enterpriseconsole_auth_database_password=hunter2
-q_puppet_enterpriseconsole_auth_password=hunter2
+
+## Password for the 'console' PostgreSQL database
 q_puppet_enterpriseconsole_database_password=hunter2
+
+## Password for the 'puppetdb' PostgreSQL database
 q_puppetdb_database_password=hunter2
+
+## Credentials for the Puppet Enterprise Console web interface
+q_puppet_enterpriseconsole_auth_user_email=admin@example.com
+q_puppet_enterpriseconsole_auth_password=hunter2

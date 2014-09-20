@@ -6,7 +6,7 @@
 # installation.
 ###############################################################################
 
-PE_VERSION="3.3.1"
+PE_VERSION="3.3.2"
 INSTALL_PATH="pe/puppet-enterprise-${PE_VERSION}-el-6-x86_64"
 ANSWER_PATH="answers"
 

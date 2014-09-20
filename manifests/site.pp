@@ -5,11 +5,19 @@
 include profile::params
 
 ## Mcollective "servers"
+## Set it here so we're certain to have it available as a top-scope variable
 $fact_stomp_server = join($profile::params::pe_stomp_servers, ',')
 
 ## ActiveMQ brokers
+## Set it here so we're certain to have it available as a top-scope variable
 $activemq_brokers = join($profile::params::pe_activemq_brokers, ',')
 
+##
+## TODO: Get rid of this.
+## Yeah, this is gross.  We want to classify the "core" Puppet servers right
+## away so we can bootstrap them off a master when needed.  We also want to
+## pull their actual certname from the profile::params class.
+##
 case $::clientcert {
   $profile::params::pe_puppetca01_fqdn: {
     include role::puppet::ca
@@ -33,6 +41,7 @@ case $::clientcert {
 
 ###############################################################################
 
+## Use the generic CNAME for 'puppetmaster' for the filebucket
 filebucket { 'main':
   server => $profile::params::puppetmaster_fqdn,
   path   => false,
@@ -40,7 +49,8 @@ filebucket { 'main':
 
 File { backup => 'main' }
 
-## Resource default for the vcsrepo type.  Keep it from complaining.
+## Resource default for the vcsrepo type.  Keep it from complaining that a
+## default provider isn't specified.
 Vcsrepo {
   provider => 'git',
 }
@@ -51,6 +61,8 @@ Package {
   allow_virtual => true,
 }
 
+###############################################################################
+## Below this line is where your own trickery will go
 ###############################################################################
 
 node default {

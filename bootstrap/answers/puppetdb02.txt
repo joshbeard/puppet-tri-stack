@@ -1,3 +1,6 @@
+## This is the answer file for the "secondary" PuppetDB server.  There's no
+## technical difference between this and the "primary" PuppetDB server, other
+## than the "primary" one has the "hot" PostgreSQL instance.
 source $( dirname "${BASH_SOURCE[0]}" )/common.txt
 
 q_all_in_one_install=n

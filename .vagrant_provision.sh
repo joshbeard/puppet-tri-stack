@@ -1,8 +1,8 @@
 #!/bin/bash
+## Yeah, it's a BASH script. So what? Tool for the job, yo.
 
-PE_VERSION="3.3.1"
-
-INSTALL=false
+## The version of PE to make available to in our Vagrant environment
+PE_VERSION="3.3.2"
 
 ###########################################################
 ANSWERS=$1
@@ -64,9 +64,11 @@ else
   echo "${DIRNAME} already present"
 fi
 
+## Make sure iptables is stopped in our Vagrant instance.
 service iptables stop
 
 echo "========================================================================"
+echo "${1} is ready to be bootstrapped."
 echo "Proceed with installation using the provided wrapper script."
 echo
 echo "/vagrant/puppet/bootstrap/bootstrap.sh"

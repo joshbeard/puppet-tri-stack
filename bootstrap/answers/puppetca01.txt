@@ -1,3 +1,4 @@
+## The primary CA/master.  This is designated as our "source of truth"
 source $( dirname "${BASH_SOURCE[0]}" )/common.txt
 
 q_all_in_one_install=n

@@ -78,6 +78,6 @@ class profile::params {
     "puppetmaster01.${::domain}",
   ]
 
-  $control_repo_address               = 'https://github.com/joshbeard/ppuppet.git'
+  $control_repo_address = 'https://github.com/joshbeard/puppet-tri-stack'
   #############################################################################
 }

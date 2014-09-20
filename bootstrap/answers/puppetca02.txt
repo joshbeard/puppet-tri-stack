@@ -1,3 +1,5 @@
+## This is the answer file for a secondary CA/master.  It doesn't /really/ have
+## to be a secondary CA, but this sets it up to be one just in case.
 source $( dirname "${BASH_SOURCE[0]}" )/common.txt
 
 q_all_in_one_install=n

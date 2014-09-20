@@ -1,3 +1,6 @@
+## This is the answer file for a secondary console.  There's no real difference
+## between this and a "primary" console.  We just grab the dashboard certs from
+## the "primary" console before installing PE.
 source $( dirname "${BASH_SOURCE[0]}" )/common.txt
 
 q_all_in_one_install=y
@@ -13,7 +16,6 @@ q_pe_database=y
 q_puppet_cloud_install=n
 q_puppet_enterpriseconsole_auth_database_name=console_auth
 q_puppet_enterpriseconsole_auth_database_user=console_auth
-q_puppet_enterpriseconsole_auth_user_email=admin@example.com
 q_puppet_enterpriseconsole_database_name=console
 q_puppet_enterpriseconsole_database_user=console
 q_puppet_enterpriseconsole_httpd_port=443

@@ -1,9 +1,13 @@
 source $( dirname "${BASH_SOURCE[0]}" )/common.txt
 
+## These are commented so that bootstrapping a master prompts for a certname
+## during the PE installation
 #q_puppetagent_certname=puppetmaster01.vagrant.vm
-q_puppetmaster_dnsaltnames=${PUPPETMASTER}.${DOMAIN},${PUPPETMASTER}
 #q_puppetmaster_certname=${PUPPETCA}.${DOMAIN}
 #q_puppetagent_server=${PUPPETMASTER}.${DOMAIN},${PUPPETMASTER}
+
+## We'll make assumptions about the altnames, though.
+q_puppetmaster_dnsaltnames=${PUPPETMASTER}.${DOMAIN},${PUPPETMASTER}
 
 q_all_in_one_install=n
 q_backup_and_purge_old_configuration=n
