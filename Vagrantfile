@@ -72,11 +72,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         vb.customize ["modifyvm", :id, "--memory", params[:mem]]
         vb.customize ["modifyvm", :id, "--cpus", params[:cpus]]
 
+        ## This significantly improves performance on multicore VMs
+        ## Yay learning the hard way
         if params[:cpus].to_i > 1
           vb.customize ["modifyvm", :id, "--ioapic", "on"]
         end
-#        vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
-#        vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
+        ## Additional NICs
+        #vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
+        #vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
       end
 
       node.vm.hostname = "#{vname}.vagrant.vm"
