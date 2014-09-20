@@ -10,7 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   instances = {
 
-    ## Andover site
+    ## Primary Site
     :puppetca01 => {
       :ip   => '192.168.29.10',
       :mem  => '1024',
@@ -33,7 +33,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     },
 
     ##################################
-    ## Midwest site
+    ## Secondary site
     :puppetca02 => {
       :ip   => '192.168.29.13',
       :mem  => '1024',
