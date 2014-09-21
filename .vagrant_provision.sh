@@ -1,4 +1,7 @@
 #!/bin/bash
+## This script is only used by Vagrant for making our environment available
+## with the right hostname resolutions and pre-downloads PE to share across
+## the instances.  It's not used outside of Vagrant.
 ## Yeah, it's a BASH script. So what? Tool for the job, yo.
 
 ## The version of PE to make available to in our Vagrant environment
@@ -67,6 +70,7 @@ else
 fi
 
 ## Make sure iptables is stopped in our Vagrant instance.
+printf "\n==> Stopping iptables\n\n"
 service iptables stop
 
 echo "========================================================================"

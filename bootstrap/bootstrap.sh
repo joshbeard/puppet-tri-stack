@@ -65,6 +65,20 @@ function install_pe() {
   "${INSTALL_PATH}/puppet-enterprise-installer" \
     -A "${ANSWER_PATH}/${ANSWERS}.txt" \
     -l "/tmp/pe_install.$(hostname -f).$(date +%Y-%m-%d_%H-%M).log"
+
+  if [ $? -eq 0 ]; then
+    echo "==> Puppet Enterprise Installer is complete"
+    echo "==> Now starting the bootstrap..."
+    echo
+  else
+    echo "==> The PE installer did not exit cleanly (0)"
+    echo "==> This might be okay. Evaluate the output and make a determination."
+    echo
+    echo "==> The bootstrap is starting. If the PE installer genuinely failed,"
+    echo "==> you should CTRL+C now, resolve the issues, uninstall PE, and"
+    echo "==> re-run the bootstrap"
+    echo
+  fi
 }
 
 function has_pe() {
@@ -149,15 +163,22 @@ case $server_role in
 
     apply_puppet_role "${ROLE}"
 
+    echo
     echo "********************************************************************"
     echo "r10k needs to be ran to create the environments and install modules."
+    echo
+    echo "This is required to bootstrap the other servers!"
     echo "You can do this by executing:"
     echo "   r10k deploy environment -pv"
+    echo "..or just let us do it now."
     echo
     read -p "=> Should we run r10k now? [y/n] " run_r10k
     if [ "${run_r10k}" == "y" ]; then
+      echo "==> Running r10k deploy environment -pv"
+      echo "==> This might take a few minutes..."
       /opt/puppet/bin/r10k deploy environment -pv
     fi
+    echo
     echo "==> ${PUPPETCA01} complete"
   ;;
   #############################################################################
@@ -189,6 +210,7 @@ case $server_role in
     echo "#    service pe-httpd restart"
     echo "#    rm -f /etc/puppetlabs/activemq/broker.*"
     echo "#    puppet agent -t --server ${PUPPETCA01}.${DOMAIN}"
+    echo "#    r10k deploy environment -pv"
     echo "#"
     echo "# Note that this CA needs to be classified with 'role::puppet::ca'"
     echo "# prior to doing the agent run."
@@ -246,6 +268,7 @@ case $server_role in
     echo "==> Restarting the pe-puppetdb service"
     service pe-puppetdb restart
 
+    echo
     echo "==> ${NAME} complete"
   ;;
   #############################################################################
@@ -285,6 +308,8 @@ case $server_role in
     /opt/puppet/bin/puppet agent -t
 
     apply_puppet_role "${ROLE}"
+    echo
+    echo "==> ${PUPPETCONSOLE01} complete"
 
   ;;
   #############################################################################
@@ -310,7 +335,7 @@ case $server_role in
       echo "       (where 'uid/gid' is the uid/gid of puppet-dashboard on ${PUPPETCONSOLE01})"
       echo
       echo "     rsync -avzp -e 'ssh' \\"
-      echo "        ${PUPPETCA01}:/opt/puppet/share/puppet-dashboard/certs/ \\"
+      echo "        ${PUPPETCONSOLE01}:/opt/puppet/share/puppet-dashboard/certs/ \\"
       echo "        /opt/puppet/share/puppet-dashboard/certs/"
       echo "#######################################################################"
       exit 1
@@ -322,8 +347,6 @@ case $server_role in
 
     echo "==> Setting certificate alternate names"
     /opt/puppet/bin/augtool set '/files//puppet.conf/main/dns_alt_names' "${ALT_NAMES}"
-
-    #apply_puppet_role "${ROLE}"
 
     echo "==> Removing SSL data"
     rm -rf /etc/puppetlabs/puppet/ssl
