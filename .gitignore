@@ -1,5 +1,6 @@
-bootstrap/pe/puppet-enterprise-3.3.1-el-6-x86_64*
+bootstrap/pe/puppet-enterprise-*
 modules
 *.swp
 *.swo
 *.log
+.vagrant

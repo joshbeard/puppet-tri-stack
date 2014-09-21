@@ -9,6 +9,7 @@ ANSWERS=$1
 PE_URL="https://s3.amazonaws.com/pe-builds/released/${PE_VERSION}/puppet-enterprise-${PE_VERSION}-el-6-x86_64.tar.gz"
 FILENAME=${PE_URL##*/}
 DIRNAME=${FILENAME%*.tar.gz}
+PE_INSTALLER="bootstrap/pe"
 
 ## A reasonable PATH
 echo "export PATH=$PATH:/usr/local/bin:/opt/puppet/bin" >> /etc/bashrc
@@ -51,7 +52,8 @@ cat > /etc/hosts <<EOH
 EOH
 
 ## Download and extract the PE installer
-cd /vagrant/puppet/bootstrap/pe || (echo "/vagrant/puppet/bootstrap/pe doesn't exist." && exit 1)
+mkdir -p /vagrant/${PE_INSTALLER} || (echo "Could not create /vagrant/${PE_INSTALLER}"; exit 1)
+cd /vagrant/${PE_INSTALLER}
 if [ ! -f $FILENAME ]; then
   curl -O ${PE_URL} || (echo "Failed to download ${PE_URL}" && exit 1)
 else
@@ -71,5 +73,5 @@ echo "========================================================================"
 echo "${1} is ready to be bootstrapped."
 echo "Proceed with installation using the provided wrapper script."
 echo
-echo "/vagrant/puppet/bootstrap/bootstrap.sh"
+echo "/vagrant/bootstrap/bootstrap.sh"
 echo "========================================================================"

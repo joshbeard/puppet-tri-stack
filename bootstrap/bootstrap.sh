@@ -57,7 +57,7 @@ function install_pe() {
     exit 1
   fi
 
-  if [ -f "${ANSWER_PATH}/${ANSWERS}.txt" ]; then
+  if [ ! -f "${ANSWER_PATH}/${ANSWERS}.txt" ]; then
     echo "Failure: Answer file not found: ${ANSWER_PATH}/${ANSWERS}.txt"
     exit 1
   fi
