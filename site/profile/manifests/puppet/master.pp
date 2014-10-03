@@ -22,7 +22,6 @@ class profile::puppet::master {
     primary            => $profile::params::pe_puppetca01_fqdn,
     shared_credentials => true,
     activemq_brokers   => $profile::params::pe_activemq_brokers,
-    stomp_servers      => $stomp_servers,
   }
 
   ## Set the stomp servers as a top-scope variable in site.pp
