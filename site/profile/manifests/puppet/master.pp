@@ -8,11 +8,12 @@ class profile::puppet::master {
 
   ## Manage various architecture settings, such as CA settings
   class { 'pe_server':
-    is_master                    => true,
     ca_server                    => $profile::params::pe_puppetca_fqdn,
-    export_console_authorization => false,
+    puppet_server                => $profile::params::puppetmaster_fqdn,
     export_puppetdb_whitelist    => false,
   }
+
+  class { 'pe_server::master': }
 
 
   ## Configure Mcollective - we want to share credentials and provide multiple
@@ -21,6 +22,7 @@ class profile::puppet::master {
     primary            => $profile::params::pe_puppetca01_fqdn,
     shared_credentials => true,
     activemq_brokers   => $profile::params::pe_activemq_brokers,
+    stomp_servers      => $stomp_servers,
   }
 
   ## Set the stomp servers as a top-scope variable in site.pp

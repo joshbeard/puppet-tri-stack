@@ -21,9 +21,8 @@ class profile::puppet::console {
   ## bootstrapping anyway.
   class { 'pe_server':
     ca_server                    => $profile::params::pe_puppetca_fqdn,
-    filebucket_server            => $profile::params::pe_puppetmaster_fqdn,
+    puppet_server                => $profile::params::pe_puppetmaster_fqdn,
     export_puppetdb_whitelist    => false,
-    export_console_authorization => false,
   }
 
   ## The console system is installed as a full-stack master.
@@ -41,7 +40,6 @@ class profile::puppet::console {
     console_cert_name              => $profile::params::pe_console_certname,
     console_certs_from_ca          => false,
     create_console_certs           => $create_console_certs,
-    collect_exported_authorization => false,
   }
 
   ## Configure the console's database connection

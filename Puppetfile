@@ -12,7 +12,7 @@
 
 mod 'pe_server',
   :git => 'https://github.com/joshbeard/pe_server.git',
-  :ref => '3.3.x'
+  :ref => 'descriptive_class_refactor'
 
 mod 'puppet_certificate',
   :git => 'https://github.com/reidmv/puppet-module-puppet_certificate.git',
